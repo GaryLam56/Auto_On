@@ -141,4 +141,4 @@ class Process_runner:
         timer.cancel()
         return proc.returncode, stdout.decode("utf-8"), stderr.decode("utf-8"), timeout["value"]
 
-AutoOn = AutoOn()
+autoOn = AutoOn()
