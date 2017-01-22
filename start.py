@@ -48,7 +48,7 @@ class AutoOn:
                 try:
                     cmd = shlex.split("ping {0}".format(user['ip']))
                     stdout = Proc(cmd).call(timeout=1.8).stdout
-                    if "bytes from" in stdout:
+                    if "bytes" in stdout:
                         if self.should_turn_on(user):
                             self.turn_on(user)
                         self.log("User: {0} is Reachable. {1}".format(user['name'], user['ip']))
@@ -70,6 +70,7 @@ class AutoOn:
     def turn_on(self, user):
         print("Turning on computer")
         sys.stdout.write("Turning on the computer")
+        sys.stdout.flush()
         os.popen("wakeonlan 88:88:88:88:87:88")
 
 
