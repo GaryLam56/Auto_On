@@ -73,7 +73,7 @@ class AutoOn:
         return "\033[91m{0}\033[0m".format(msg)
 
 
-    def update_console_status(self, user):
+    def update_console_status(self):
         os.system('clear')
         sys.stdout.flush()
         string = ""
