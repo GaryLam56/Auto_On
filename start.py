@@ -29,8 +29,10 @@ class AutoOn:
         self.users = self.load_json('users.json')
         self.start_time = datetime.datetime.now()
 
+        sys.stdout.flush()
         self.update_console_status()
         self.run_loop()
+
 
         def load_json(self, file_name):
             json_data = open(file_name)
@@ -38,22 +40,23 @@ class AutoOn:
             return data
 
 
-        def run_loop():
+        def run_loop(self):
             while True:
                 for user in self.users:
-                    cmd = shlex.split("ping {0}".format(user['ip']))
-                    stdout = Proc(cmd).call(timeout=1.8).stdout
-                    if "bytes from" in stdout:
-                        if self.should_turn_on(user):
-                            self.turn_on(user)
-                        self.log("User: {0} is Reachable. {1}".format(user['name'], user['ip']))
-                        user['last_seen'] = datetime.datetime.now()
-                        user['confirmed_not_there'] = False
+                    try:
+                        cmd = shlex.split("ping {0}".format(user['ip']))
+                        stdout = Proc(cmd).call(timeout=1.8).stdout
+                        if "bytes from" in stdout:
+                            if self.should_turn_on(user):
+                                self.turn_on(user)
+                            self.log("User: {0} is Reachable. {1}".format(user['name'], user['ip']))
+                            user['last_seen'] = datetime.datetime.now()
+                            user['confirmed_not_there'] = False
 
-                    except subprocess.CalledProcessorError,e:
-                        print "ERROR {0{".format(e)
+                    except(subprocess.CalledProcessError, e):
+                       print("ERROR {0}".format(e))
                     else:
-                        pass
+                       pass
 
 
         def turn_on(self, user):
@@ -118,22 +121,24 @@ class AutoOn:
                                                                                         distant_time))
                 return False
 
+
 class Process_runner:
-	def __init__(self, cmd, timeout):
-		self.run(cmd, timeout)
+    def __init__(self, cmd, timeout):
+        self.run(cmd, timeout)
 
-	@staticmethod
-	def kill_proc(proc, timeout):
-		timeout["value"] = True
-		proc.kill()
+    @staticmethod
+    def kill_proc(proc, timeout):
+        timeout["value"] = True
+        proc.kill()
 
-	def run(self, cmd, timeout_sec):
-		proc = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-		timeout = {"value": False}
-		timer = Timer(timeout_sec, self.kill_proc, [proc, timeout])
-		timer.start()
-		stdout, stderr = proc.communicate()
-		timer.cancel()
-		return proc.returncode, stdout.decode("utf-8"), stderr.decode("utf-8"), timeout["value"]
+
+    def run(self, cmd, timeout_sec):
+        proc = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        timeout = {"value": False}
+        timer = Timer(timeout_sec, self.kill_proc, [proc, timeout])
+        timer.start()
+        stdout, stderr = proc.communicate()
+        timer.cancel()
+        return proc.returncode, stdout.decode("utf-8"), stderr.decode("utf-8"), timeout["value"]
 
 AutoOn = AutoOn()
