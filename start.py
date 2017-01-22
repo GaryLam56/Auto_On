@@ -68,10 +68,8 @@ class AutoOn:
 
 
     def turn_on(self, user):
-        print("Turning on computer")
         sys.stdout.write("Turning on the computer")
         sys.stdout.flush()
-        os.popen("wakeonlan 88:88:88:88:87:88")
 
 
     @staticmethod
@@ -100,7 +98,7 @@ class AutoOn:
 
     @staticmethod
     def log(message):
-        print(message)
+        # print(message)
         pass
 
 
