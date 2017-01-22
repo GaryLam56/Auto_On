@@ -70,6 +70,7 @@ class AutoOn:
     def turn_on(self, user):
         sys.stdout.write("Turning on the computer")
         sys.stdout.flush()
+        os.popen("wakeonlan -p 9 88:88:88:88:87:88")
 
 
     @staticmethod
