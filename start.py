@@ -43,6 +43,8 @@ class AutoOn:
     def run_loop(self):
         while True:
             for user in self.users:
+                if not 'confirmed_not_there' in user:
+                    user['confirmed_not_there'] = False
                 try:
                     cmd = shlex.split("ping {0}".format(user['ip']))
                     stdout = Proc(cmd).call(timeout=1.8).stdout
@@ -53,14 +55,20 @@ class AutoOn:
                         user['last_seen'] = datetime.datetime.now()
                         user['confirmed_not_there'] = False
 
-                except(subprocess.CalledProcessError, e):
-                   print("ERROR {0}".format(e))
+                    else:
+                        user['confirmed_not_there'] = True
+                        last_seen = user['last_seen'] if 'last_seen' in user else "never"
+                        self.log("User: {0} is NotReachable. last seen: {1}".format(user['name'], last_seen))
+                    self.update_console_status()
+
+                except subprocess.CalledProcessError:
+                    print("subprocess.CalledProcessError")
                 else:
-                   pass
+                    pass
 
 
     def turn_on(self, user):
-         print("Turning on computer")
+        print("Turning on computer")
 
 
     @staticmethod
@@ -94,12 +102,12 @@ class AutoOn:
 
 
     def should_turn_on(self, user):
-        # If we haven't confirmed they aren't there, then don't play
+        # If we haven't confirmed they aren't there, then don't turn on
         if not user['confirmed_not_there']:
             self.log("{0} was not confirmed to not be there".format(user['name']))
             return False
 
-        # If we have confirmed they were previously not there and last_seen isn't set then play
+        # If we have confirmed they were previously not there and last_seen isn't set then turn on
         if not 'last_seen' in user:
             # Did we just restart the script?
             five_mins_ago = datetime.datetime.now() - datetime.timedelta(minutes=self.config['away_timeout_mins'])
