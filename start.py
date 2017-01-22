@@ -15,7 +15,7 @@ class AutoOn:
     def __init__(self):
 
         self.default_config = {
-            'away_timeout_mins' : 15
+            'away_timeout_mins' : 30
         }
 
         self.config = self.load_json('config.json')
